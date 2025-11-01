@@ -10,6 +10,7 @@ import {
 } from "../utils/ColorUtil";
 import {Input} from "../components/Input";
 import {Button} from "../components/Button";
+import Footer from "../components/Footer";
 
 const Index = () => {
     const [hexInput, setHexInput] = useState("#3B82F6");
@@ -188,6 +189,7 @@ const Index = () => {
                     </div>
                 )}
             </div>
+            <Footer />
         </div>
     );
 };
