@@ -1,4 +1,5 @@
 import { formatHex, oklch, parse } from "culori";
+import toast from "react-hot-toast";
 
 // Type Definitions
 type ColorScale = Record<string, string>;
@@ -114,7 +115,9 @@ function getContrastRatio(hex1: string, hex2: string): number {
 export function generateColorScale(hex: string): { scale: ColorScale, baseShade: string } {
     const parsedColor = parse(hex);
     if (!parsedColor) {
-        throw new Error('Invalid hex color format');
+        toast.error('Invalid hex color format');
+
+        return generateColorScale('#3B82F6');
     }
 
     const { l, c, h } = oklch(parsedColor) as OklchColor;
