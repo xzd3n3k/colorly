@@ -13,7 +13,7 @@ import {Button} from "../components/Button";
 import Footer from "../components/Footer";
 
 const Index = () => {
-    const [hexInput, setHexInput] = useState("#3B82F6");
+    const [hexInput, setHexInput] = useState("");
     const [primaryPalette, setPrimaryPalette] = useState<string[]>([]);
     const [secondaryPalette, setSecondaryPalette] = useState<string[]>([]);
     const [secondaryComplementaryPalette, setSecondaryComplementaryPalette] = useState<string[]>([]);
@@ -58,7 +58,15 @@ const Index = () => {
             <div className="container mx-auto px-6 py-20 max-w-7xl">
                 <header className="mb-20 text-center animate-fade-in">
                     <div className="mb-8 inline-flex items-center justify-center rounded-2xl bg-primary/5 p-6">
-                        <Palette className="h-12 w-12 text-primary" strokeWidth={1.5} />
+                        <Palette
+                            className="h-12 w-12 text-primary"
+                            strokeWidth={1.5}
+                            style={{
+                                color: primaryPalette.length
+                                    ? primaryPalette[5]
+                                    : undefined
+                            }}
+                        />
                     </div>
                     <h1 className="mb-4 text-6xl font-extralight tracking-tight text-foreground sm:text-7xl">
                         Color Palette Generator
@@ -84,6 +92,11 @@ const Index = () => {
                         <Button
                             onClick={handleGenerate}
                             className="w-full h-14 text-base font-medium rounded-xl shadow-sm hover:shadow-md transition-all"
+                            style={{
+                                backgroundColor: primaryPalette.length
+                                    ? primaryPalette[5]
+                                    : undefined,
+                            }}
                         >
                             Generate Palettes
                         </Button>
