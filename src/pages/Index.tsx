@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Palette } from "lucide-react";
+import {Check, Copy, Palette, X} from "lucide-react";
 import toast from "react-hot-toast";
 import ColorCard from "../components/ColorCard";
 import {
@@ -11,6 +11,7 @@ import {
 import {Input} from "../components/Input";
 import {Button} from "../components/Button";
 import Footer from "../components/Footer";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../components/Dialog";
 
 const Index = () => {
     const [hexInput, setHexInput] = useState("");
@@ -60,6 +61,66 @@ const Index = () => {
 
     const shadeLabels = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"];
 
+    type PaletteToGenerate =
+        | { type: "single"; palette: string[]; prefix: string }
+        | { type: "multi"; palettes: Record<string, string[]> };
+
+    const [paletteToGenerate, setPaletteToGenerate] = useState<PaletteToGenerate | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    function openDialog(palette: string[], prefix: string) {
+        setPaletteToGenerate({ type: "single", palette, prefix });
+        setDialogOpen(true);
+    }
+
+    function openDialogForSupportingPalettes(palettes: {
+        info: string[];
+        success: string[];
+        warning: string[];
+        danger: string[];
+    }) {
+        setPaletteToGenerate({ type: "multi", palettes });
+        setDialogOpen(true);
+    }
+
+    function closeDialog() {
+        setDialogOpen(false);
+    }
+
+    const generateCSS = () => {
+        if (!paletteToGenerate) return "";
+
+        if (paletteToGenerate.type === "single") {
+            const { palette, prefix } = paletteToGenerate;
+            return `:root {\n${palette
+                .map((color, index) => `  --color-${prefix}-${shadeLabels[index]}: ${color};`)
+                .join("\n")}\n}`;
+        }
+
+        if (paletteToGenerate.type === "multi") {
+            const sections = Object.entries(paletteToGenerate.palettes).map(
+                ([name, colors]) => {
+                    const lines = colors
+                        .map(
+                            (color, index) =>
+                                `  --color-${name}-${shadeLabels[index]}: ${color};`
+                        )
+                        .join("\n");
+                    return lines;
+                }
+            );
+            return `:root {\n${sections.join("\n\n")}\n}`;
+        }
+
+        return "";
+    };
+
+    const copyCSS = () => {
+        navigator.clipboard.writeText(generateCSS());
+        toast.success("CSS copied!");
+    };
+
+
     return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto px-6 py-20 max-w-7xl">
@@ -108,6 +169,15 @@ const Index = () => {
                                 <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                                     Primary Palette
                                 </h2>
+
+                                <Button
+                                    onClick={() => openDialog(primaryPalette, 'primary')}
+                                    className="flex items-center gap-2 rounded-lg bg-primary-light px-4 py-2 text-sm font-medium text-primary hover:bg-primary-light-hover transition-colors"
+                                >
+                                    <Copy className="w-4 h-4" />
+                                    View CSS
+                                </Button>
+
                                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                             </div>
                             <div className="grid grid-cols-3 gap-4 sm:grid-cols-5 lg:grid-cols-9">
@@ -127,6 +197,15 @@ const Index = () => {
                                 <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                                     Secondary Palette
                                 </h2>
+
+                                <Button
+                                    onClick={() => openDialog(secondaryPalette, 'secondary')}
+                                    className="flex items-center gap-2 rounded-lg bg-primary-light px-4 py-2 text-sm font-medium text-primary hover:bg-primary-light-hover transition-colors"
+                                >
+                                    <Copy className="w-4 h-4" />
+                                    View CSS
+                                </Button>
+
                                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                             </div>
                             <div className="grid grid-cols-3 gap-4 sm:grid-cols-5 lg:grid-cols-9">
@@ -146,6 +225,15 @@ const Index = () => {
                                 <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                                     Secondary Complementary Palette
                                 </h2>
+
+                                <Button
+                                    onClick={() => openDialog(secondaryComplementaryPalette, 'complementary')}
+                                    className="flex items-center gap-2 rounded-lg bg-primary-light px-4 py-2 text-sm font-medium text-primary hover:bg-primary-light-hover transition-colors"
+                                >
+                                    <Copy className="w-4 h-4" />
+                                    View CSS
+                                </Button>
+
                                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                             </div>
                             <div className="grid grid-cols-3 gap-4 sm:grid-cols-5 lg:grid-cols-9">
@@ -166,6 +254,15 @@ const Index = () => {
                                     <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                                         Supporting Colors
                                     </h2>
+
+                                    <Button
+                                        onClick={() => openDialogForSupportingPalettes(supportingPalettes)}
+                                        className="flex items-center gap-2 rounded-lg bg-primary-light px-4 py-2 text-sm font-medium text-primary hover:bg-primary-light-hover transition-colors"
+                                    >
+                                        <Copy className="w-4 h-4" />
+                                        View CSS
+                                    </Button>
+
                                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                                 </div>
                                 <div className="space-y-12">
@@ -198,6 +295,33 @@ const Index = () => {
                         </p>
                     </div>
                 )}
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                Generated CSS Variables
+                            </DialogTitle>
+                        </DialogHeader>
+
+                        <div className="py-4">
+                            <pre className="bg-muted/10 rounded-lg p-4 text-sm font-mono overflow-x-auto max-h-[400px] border border-border">
+                                {generateCSS()}
+                            </pre>
+                        </div>
+
+                        <DialogFooter>
+                            <Button
+                                onClick={() => {
+                                    copyCSS();
+                                    closeDialog();
+                                }}
+                            >
+                                <Copy className="w-4 h-4" />
+                                Copy CSS
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
             <Footer />
         </div>
