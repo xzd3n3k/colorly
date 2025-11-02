@@ -26,7 +26,10 @@ const Index = () => {
     } | null>(null);
 
     const handleGenerate = () => {
-        const cleanHex = hexInput.startsWith("#") ? hexInput : `#${hexInput}`;
+        let cleanHex = '#3B82F6';
+        if (hexInput) {
+            cleanHex = hexInput.startsWith("#") ? hexInput : `#${hexInput}`;
+        }
 
         const primary = generateColorScale(cleanHex);
         const secondary = generateSecondaryPalette(primary.scale);
