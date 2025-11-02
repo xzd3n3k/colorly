@@ -11,7 +11,6 @@ import {
 import {Input} from "../components/Input";
 import {Button} from "../components/Button";
 import Footer from "../components/Footer";
-import {colord} from "colord";
 
 const Index = () => {
     const [hexInput, setHexInput] = useState("");
