@@ -40,7 +40,7 @@ const ColorCard = ({ color, label }: ColorCardProps) => {
                             {color.toUpperCase()}
                         </p>
                     </div>
-                    <div className="flex-shrink-0 rounded-full bg-muted/50 p-1.5 transition-all duration-300 group-hover:bg-primary/10">
+                    <div className="flex-shrink-0 rounded-full bg-muted p-1.5 transition-all duration-300 group-hover:bg-primary-light">
                         {copied ? (
                             <Check className="h-3.5 w-3.5 text-primary" />
                         ) : (

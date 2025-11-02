@@ -11,6 +11,7 @@ import {
 import {Input} from "../components/Input";
 import {Button} from "../components/Button";
 import Footer from "../components/Footer";
+import {colord} from "colord";
 
 const Index = () => {
     const [hexInput, setHexInput] = useState("");
@@ -42,6 +43,13 @@ const Index = () => {
             danger: Object.values(supporting.danger),
         });
 
+        document.documentElement.style.setProperty("--primary", Object.values(primary.scale)[5]);
+        document.documentElement.style.setProperty("--primary-hover", Object.values(primary.scale)[4]);
+        document.documentElement.style.setProperty("--primary-light", Object.values(primary.scale)[0]);
+        document.documentElement.style.setProperty("--primary-light-hover", Object.values(primary.scale)[1]);
+
+        document.documentElement.style.setProperty("--ring", Object.values(primary.scale)[6]);
+
         toast.success("Color palettes generated successfully!");
     };
 
@@ -57,15 +65,10 @@ const Index = () => {
         <div className="min-h-screen bg-background">
             <div className="container mx-auto px-6 py-20 max-w-7xl">
                 <header className="mb-20 text-center animate-fade-in">
-                    <div className="mb-8 inline-flex items-center justify-center rounded-2xl bg-primary/5 p-6">
+                    <div className="mb-8 inline-flex items-center justify-center rounded-2xl bg-primary-light p-6">
                         <Palette
                             className="h-12 w-12 text-primary"
                             strokeWidth={1.5}
-                            style={{
-                                color: primaryPalette.length
-                                    ? primaryPalette[5]
-                                    : undefined
-                            }}
                         />
                     </div>
                     <h1 className="mb-4 text-6xl font-extralight tracking-tight text-foreground sm:text-7xl">
@@ -86,17 +89,12 @@ const Index = () => {
                                 value={hexInput}
                                 onChange={(e) => setHexInput(e.target.value)}
                                 onKeyPress={handleKeyPress}
-                                className="h-14 rounded-xl border-0 bg-card font-mono text-center text-xl shadow-sm ring-1 ring-border/50 transition-all focus-visible:ring-2 focus-visible:ring-primary/50"
+                                className="h-14 rounded-xl border-0 bg-card font-mono text-center text-xl shadow-sm ring-1 ring-border transition-all focus-visible:ring-2 focus-visible:ring-primary"
                             />
                         </div>
                         <Button
                             onClick={handleGenerate}
                             className="w-full h-14 text-base font-medium rounded-xl shadow-sm hover:shadow-md transition-all"
-                            style={{
-                                backgroundColor: primaryPalette.length
-                                    ? primaryPalette[5]
-                                    : undefined,
-                            }}
                         >
                             Generate Palettes
                         </Button>
