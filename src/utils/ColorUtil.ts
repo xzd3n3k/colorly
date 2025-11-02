@@ -115,7 +115,7 @@ function getContrastRatio(hex1: string, hex2: string): number {
 export function generateColorScale(hex: string): { scale: ColorScale, baseShade: string } {
     const parsedColor = parse(hex);
     if (!parsedColor) {
-        toast.error('Invalid hex color format');
+        toast.error("Invalid hex color format, fallback to '#3B82F6'");
 
         return generateColorScale('#3B82F6');
     }
@@ -147,8 +147,7 @@ export function generateColorScale(hex: string): { scale: ColorScale, baseShade:
     return { scale, baseShade };
 }
 
-export function generateSecondaryPalette(primaryHex: string, options?: { hueShift?: number, chromaFactor?: number }) {
-    const { scale: primaryScale } = generateColorScale(primaryHex);
+export function generateSecondaryPalette(primaryScale: ColorScale, options?: { hueShift?: number, chromaFactor?: number }) {
 
     const secondaryScale: ColorScale = {};
     const hueShift = options?.hueShift ?? 30; // default shift +30°
@@ -177,9 +176,7 @@ export function generateSecondaryPalette(primaryHex: string, options?: { hueShif
  * Generates a complementary 11-shade palette for a primary hex color.
  * Works exactly like generateColorScale, but rotates hue +180°.
  */
-export function generateComplementaryScale(primaryHex: string, options?: { chromaFactor?: number }): ColorScale {
-    const { scale: primaryScale } = generateColorScale(primaryHex);
-
+export function generateComplementaryScale(primaryScale: ColorScale, options?: { chromaFactor?: number }): ColorScale {
     const chromaFactor = options?.chromaFactor ?? 1; // keep chroma same by default
     const complementaryScale: ColorScale = {};
 
@@ -224,10 +221,8 @@ export function generateContrastGrid(scale: ColorScale): Record<string, Record<s
 }
 
 export function generateSemanticPaletteSmart(
-    primaryHex: string
+    primaryScale: ColorScale
 ): Record<'info' | 'danger' | 'success' | 'warning', Record<string, string>> {
-    const { scale: primaryScale } = generateColorScale(primaryHex);
-
     const semanticScale: Record<'info' | 'danger' | 'success' | 'warning', Record<string, string>> = {
         info: {},
         danger: {},

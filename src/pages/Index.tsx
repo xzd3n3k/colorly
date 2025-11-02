@@ -28,9 +28,9 @@ const Index = () => {
         const cleanHex = hexInput.startsWith("#") ? hexInput : `#${hexInput}`;
 
         const primary = generateColorScale(cleanHex);
-        const secondary = generateSecondaryPalette(cleanHex);
-        const secondaryComplementary = generateComplementaryScale(cleanHex);
-        const supporting = generateSemanticPaletteSmart(cleanHex);
+        const secondary = generateSecondaryPalette(primary.scale);
+        const secondaryComplementary = generateComplementaryScale(primary.scale);
+        const supporting = generateSemanticPaletteSmart(primary.scale);
 
         setPrimaryPalette(Object.values(primary.scale));
         setSecondaryPalette(Object.values(secondary));
