@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {Check, Copy, Palette, X} from "lucide-react";
+import { Copy, Palette } from "lucide-react";
 import toast from "react-hot-toast";
 import ColorCard from "../components/ColorCard";
 import {
@@ -11,7 +11,7 @@ import {
 import {Input} from "../components/Input";
 import {Button} from "../components/Button";
 import Footer from "../components/Footer";
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "../components/Dialog";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "../components/Dialog";
 
 const Index = () => {
     const [hexInput, setHexInput] = useState("");
