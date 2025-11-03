@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cn } from "../utils/utils"; // assuming you have a utility for classNames merging
+import { cn } from "../utils/utils";
 
 type ButtonVariant = "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 type ButtonSize = "default" | "sm" | "lg" | "icon";
