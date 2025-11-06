@@ -148,7 +148,7 @@ const Index = () => {
     return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto px-6 py-20 max-w-7xl">
-                <div className="fixed top-8 right-8 flex items-center gap-3">
+                <div className="fixed top-8 right-8 flex items-center gap-3 bg-background p-2.5 rounded-md z-10">
                     <Label htmlFor="mode-switch" className="text-sm font-medium">
                         {useTailwindMode ? 'Tailwind Mode' : 'Basic Mode'}
                     </Label>
