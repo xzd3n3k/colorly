@@ -35,6 +35,7 @@ const Index = () => {
             return;
         }
         handleGenerate(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [useTailwindMode]);
 
     const handleGenerate = (calledProgrammaticaly?: boolean) => {
