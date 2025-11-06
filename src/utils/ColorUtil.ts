@@ -1,5 +1,7 @@
 import { formatHex, oklch, parse } from "culori";
+import chroma from "chroma-js";
 import toast from "react-hot-toast";
+import {tailwindPalette} from "./utils";
 
 // Type Definitions
 type ColorScale = Record<string, string>;
@@ -250,8 +252,91 @@ export function generateSemanticPaletteSmart(
     return semanticScale;
 }
 
+export function generateTailwindColors(primaryColor: string) {
+    const palettes = tailwindPalette.map((colorShades) => {
+        const shades = colorShades.map((shade) => {
+            return {
+                ...shade,
+                delta: chroma.deltaE(primaryColor, shade.hexcode),
+                lightnessDiff: 0,
+            };
+        });
 
+        const closestShade = shades.reduce((prev, current) => {
+            return prev.delta < current.delta ? prev : current;
+        });
 
+        return {
+            shades,
+            closestShade,
+            closestShadeLightness: {
+                delta: 0,
+                lightnessDiff: 0,
+                number: 50,
+                hexcode: "#ffffff",
+            },
+        };
+    });
 
+    const palette = palettes.reduce((prev, current) => {
+        return prev.closestShade.delta < current.closestShade.delta ? prev : current;
+    });
 
+    palette.shades = palette.shades.map((shade) => {
+        return {
+            ...shade,
+            lightnessDiff: Math.abs(
+                chroma(shade.hexcode).get("hsl.l") - chroma(primaryColor).get("hsl.l")
+            ),
+        };
+    });
 
+    palette.closestShadeLightness = palette.shades.reduce((prev, current) => {
+        return prev.lightnessDiff < current.lightnessDiff ? prev : current;
+    });
+
+    const hexColorHue = chroma(primaryColor).get("hsl.h");
+    const closestShadeLightnessHue = chroma(
+        palette.closestShadeLightness.hexcode
+    ).get("hsl.h");
+    const hueDelta = hexColorHue - (closestShadeLightnessHue || 0);
+
+    const primaryColorSaturation = chroma(primaryColor).get("hsl.s");
+    const closestShadeSaturation = chroma(
+        palette.closestShadeLightness.hexcode
+    ).get("hsl.s");
+    const saturationDelta = primaryColorSaturation / closestShadeSaturation;
+
+    let hueDeltaString = "";
+    if (hueDelta === 0) {
+        hueDeltaString = closestShadeLightnessHue.toString();
+    } else if (hueDelta > 0) {
+        hueDeltaString = `+${hueDelta}`;
+    } else {
+        hueDeltaString = hueDelta.toString();
+    }
+
+    return palette.shades
+        .map((shade) => {
+            let shadeHexcode = shade.hexcode;
+            const shadeSaturation = chroma(shadeHexcode).get("hsl.s") * saturationDelta;
+
+            shadeHexcode = chroma(shadeHexcode).set("hsl.s", shadeSaturation).hex();
+            shadeHexcode = chroma(shadeHexcode).set("hsl.h", hueDeltaString).hex();
+
+            if (palette.closestShadeLightness.number == shade.number) {
+                shadeHexcode = chroma(primaryColor).hex();
+            }
+
+            return {
+                number: shade.number,
+                color: shadeHexcode,
+                root: palette.closestShadeLightness.number === shade.number,
+            };
+        })
+        .reduce((acc, shade) => {
+            acc[shade.number] = shade.color;
+
+            return acc;
+        }, {} as Record<string | number, string>);
+}
