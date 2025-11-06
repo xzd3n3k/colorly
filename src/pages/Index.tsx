@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Copy, Palette } from "lucide-react";
 import toast from "react-hot-toast";
 import ColorCard from "../components/ColorCard";
@@ -6,15 +6,19 @@ import {
     generateColorScale,
     generateComplementaryScale,
     generateSecondaryPalette,
-    generateSemanticPaletteSmart,
+    generateSemanticPaletteSmart, generateTailwindColors,
 } from "../utils/ColorUtil";
 import {Input} from "../components/Input";
 import {Button} from "../components/Button";
 import Footer from "../components/Footer";
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "../components/Dialog";
+import {Label} from "../components/Label";
+import {Switch} from "../components/Switch";
 
 const Index = () => {
-    const [hexInput, setHexInput] = useState("");
+    const [useTailwindMode, setUseTailwindMode] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+    const [hexInput, setHexInput] = useState("#3B82F6");
     const [primaryPalette, setPrimaryPalette] = useState<string[]>([]);
     const [secondaryPalette, setSecondaryPalette] = useState<string[]>([]);
     const [secondaryComplementaryPalette, setSecondaryComplementaryPalette] = useState<string[]>([]);
@@ -25,35 +29,52 @@ const Index = () => {
         danger: string[];
     } | null>(null);
 
-    const handleGenerate = () => {
+    useEffect(() => {
+        if (!isMounted) {
+            setIsMounted(true);
+            return;
+        }
+        handleGenerate(true);
+    }, [useTailwindMode]);
+
+    const handleGenerate = (calledProgrammaticaly?: boolean) => {
         let cleanHex = '#3B82F6';
         if (hexInput) {
             cleanHex = hexInput.startsWith("#") ? hexInput : `#${hexInput}`;
         }
 
-        const primary = generateColorScale(cleanHex);
-        const secondary = generateSecondaryPalette(primary.scale);
-        const secondaryComplementary = generateComplementaryScale(primary.scale);
-        const supporting = generateSemanticPaletteSmart(primary.scale);
+        let primary = generateColorScale(cleanHex).scale;
 
-        setPrimaryPalette(Object.values(primary.scale));
+        if (useTailwindMode) {
+            primary = generateTailwindColors(cleanHex);
+            setSupportingPalettes(null);
+        } else {
+            const supporting = generateSemanticPaletteSmart(primary);
+            setSupportingPalettes({
+                info: Object.values(supporting.info),
+                success: Object.values(supporting.success),
+                warning: Object.values(supporting.warning),
+                danger: Object.values(supporting.danger),
+            });
+        }
+
+        const secondary = generateSecondaryPalette(primary);
+        const secondaryComplementary = generateComplementaryScale(primary);
+
+        setPrimaryPalette(Object.values(primary));
         setSecondaryPalette(Object.values(secondary));
         setSecondaryComplementaryPalette(Object.values(secondaryComplementary))
-        setSupportingPalettes({
-            info: Object.values(supporting.info),
-            success: Object.values(supporting.success),
-            warning: Object.values(supporting.warning),
-            danger: Object.values(supporting.danger),
-        });
 
-        document.documentElement.style.setProperty("--primary", Object.values(primary.scale)[5]);
-        document.documentElement.style.setProperty("--primary-hover", Object.values(primary.scale)[4]);
-        document.documentElement.style.setProperty("--primary-light", Object.values(primary.scale)[0]);
-        document.documentElement.style.setProperty("--primary-light-hover", Object.values(primary.scale)[1]);
+        document.documentElement.style.setProperty("--primary", Object.values(primary)[5]);
+        document.documentElement.style.setProperty("--primary-hover", Object.values(primary)[4]);
+        document.documentElement.style.setProperty("--primary-light", Object.values(primary)[0]);
+        document.documentElement.style.setProperty("--primary-light-hover", Object.values(primary)[1]);
 
-        document.documentElement.style.setProperty("--ring", Object.values(primary.scale)[6]);
+        document.documentElement.style.setProperty("--ring", Object.values(primary)[6]);
 
-        toast.success("Color palettes generated successfully!");
+        if (!calledProgrammaticaly) {
+            toast.success("Color palettes generated successfully!");
+        }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -127,6 +148,16 @@ const Index = () => {
     return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto px-6 py-20 max-w-7xl">
+                <div className="fixed top-8 right-8 flex items-center gap-3">
+                    <Label htmlFor="mode-switch" className="text-sm font-medium">
+                        {useTailwindMode ? 'Tailwind Mode' : 'Basic Mode'}
+                    </Label>
+                    <Switch
+                        id="mode-switch"
+                        checked={useTailwindMode}
+                        onCheckedChange={setUseTailwindMode}
+                    />
+                </div>
                 <header className="mb-20 text-center animate-fade-in">
                     <div className="mb-8 inline-flex items-center justify-center rounded-2xl bg-primary-light p-6">
                         <Palette
@@ -156,7 +187,7 @@ const Index = () => {
                             />
                         </div>
                         <Button
-                            onClick={handleGenerate}
+                            onClick={() => handleGenerate()}
                             className="w-full h-14 text-base font-medium rounded-xl shadow-sm hover:shadow-md transition-all"
                         >
                             Generate Palettes
