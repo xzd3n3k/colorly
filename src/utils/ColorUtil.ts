@@ -324,7 +324,7 @@ export function generateTailwindColors(primaryColor: string) {
             shadeHexcode = chroma(shadeHexcode).set("hsl.s", shadeSaturation).hex();
             shadeHexcode = chroma(shadeHexcode).set("hsl.h", hueDeltaString).hex();
 
-            if (palette.closestShadeLightness.number == shade.number) {
+            if (palette.closestShadeLightness.number === shade.number) {
                 shadeHexcode = chroma(primaryColor).hex();
             }
 
