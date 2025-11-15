@@ -340,3 +340,7 @@ export function generateTailwindColors(primaryColor: string) {
             return acc;
         }, {} as Record<string | number, string>);
 }
+
+export function generateComplementaryTailwindColors(primaryScale: ColorScale) {
+    return generateTailwindColors(generateComplementaryScale(primaryScale)[600]);
+}

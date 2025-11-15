@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import ColorCard from "../components/ColorCard";
 import {
     generateColorScale,
-    generateComplementaryScale,
+    generateComplementaryScale, generateComplementaryTailwindColors,
     generateSecondaryPalette,
     generateSemanticPaletteSmart, generateTailwindColors,
 } from "../utils/ColorUtil";
@@ -45,9 +45,11 @@ const Index = () => {
         }
 
         let primary = generateColorScale(cleanHex).scale;
+        let secondaryComplementary = generateComplementaryScale(primary);
 
         if (useTailwindMode) {
             primary = generateTailwindColors(cleanHex);
+            secondaryComplementary = generateComplementaryTailwindColors(primary);
             setSupportingPalettes(null);
         } else {
             const supporting = generateSemanticPaletteSmart(primary);
@@ -60,7 +62,6 @@ const Index = () => {
         }
 
         const secondary = generateSecondaryPalette(primary);
-        const secondaryComplementary = generateComplementaryScale(primary);
 
         setPrimaryPalette(Object.values(primary));
         setSecondaryPalette(Object.values(secondary));
